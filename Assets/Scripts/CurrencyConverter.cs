@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Data;
-using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -16,10 +15,6 @@ public class CurrencyConverter : MonoBehaviour
     private void Start()
     {
         currencyListRequestActive = false;
-    }
-
-    public void CheckInput()
-    {
     }
 
     public bool SendCurrencyListRequest(string inputStr)
