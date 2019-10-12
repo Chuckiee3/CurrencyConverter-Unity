@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
@@ -22,7 +23,11 @@ public class ActionHandler : MonoBehaviour
     
     [Header("Input")]
     [SerializeField]
-    private TMP_InputField inputDate;
+    private TMP_InputField inputDateYear;
+    [SerializeField]
+    private TMP_InputField inputDateMonth;
+    [SerializeField]
+    private TMP_InputField inputDateDay;
     [SerializeField]
     private TMP_InputField inputAmount;
     
@@ -53,77 +58,69 @@ public class ActionHandler : MonoBehaviour
     
     public int minimumYear;
 
-    public void OnDateTextChanged()
+    public void OnYearTextChanged()
     {
-        #region InputAddRemoveMinusSign
-        
-        //Add remove - to input Correctly
-        var length = inputDate.text.Length;
-        if(previousCharacterCount < length){
-            if (length != 4 && length != 7)
-            {
-                previousCharacterCount = length;
-                return;
-            }
-            inputDate.text += "-";
-            previousCharacterCount = length + 1;
-            inputDate.caretPosition = length+1;
-        
-        }
-        else
-        {
-            if (length != 4 && length != 7) return;
-            length--;
-            previousCharacterCount = length;
-            inputDate.text = inputDate.text.Substring(0, length);
-        }
-        
-        #endregion
-
-        #region YearInputCorrection
-        
-        var index = inputDate.text.IndexOf("-", StringComparison.Ordinal);
-        if (length < 4 || index == -1 || index < 4) return;
-        var year = int.Parse(inputDate.text.Substring(0,index));
-        if (year <= minimumYear)
+      
+        if (string.IsNullOrEmpty(inputDateYear.text)) return;
+        if (inputDateYear.text.Length != 4) return;
+        var year = int.Parse(inputDateYear.text);
+        if ( year <= minimumYear)
         {
             year = minimumYear;
-            inputDate.text = year.ToString() + inputDate.text.Substring(4, inputDate.text.Length - 4);
-            inputDate.caretPosition = length+1;
-            return;
+            inputDateYear.text = year.ToString();
         }
 
-        if (year <= System.DateTime.Today.Year) return;
-        year = System.DateTime.Today.Year;
-        inputDate.text = year.ToString() + inputDate.text.Substring(4, inputDate.text.Length - 4);
-        inputDate.caretPosition = length+1;
-        #endregion
+        if (year > System.DateTime.Today.Year) {
+            year = System.DateTime.Today.Year;
+            inputDateYear.text = year.ToString();
+        }
 
-        #region MonthInputCorrection
+        inputDateMonth.Select();
+        inputDateMonth.ActivateInputField();
 
-        
+    }
 
-        #endregion
-        #region DayInputCorrection
+    public void OnMonthTextChanged()
+    {
+        if (string.IsNullOrEmpty(inputDateMonth.text)) return;
+        var month = int.Parse(inputDateMonth.text);
+        if (month <= 0)
+        {
+            month = 1;
+        }else if (month > 12)
+        {
+            month = 12;
+        }
 
-        
+        inputDateMonth.text = month.ToString();
+    }
+    public void OnDayTextChanged()
+    {
+        if (string.IsNullOrEmpty(inputDateDay.text)) return;
+        var day = int.Parse(inputDateDay.text);
+        if (day <= 0)
+        {
+            day = 1;
+        }else if (day > 31)
+        {
+            day = 31;
+        }
 
-        #endregion
-
-        #region FinalInputCorrection
-
-        
-
-        #endregion
-
-        
+        inputDateDay.text = day.ToString();
     }
 
     public void OnGetCurrenciesTapped()
     {
-        if (converter.SendCurrencyListRequest(inputDate.text))
+        var builder = new StringBuilder();
+        builder.Append(inputDateYear.text);
+        builder.Append("-");
+        builder.Append(inputDateMonth.text);
+        builder.Append("-");
+        builder.Append(inputDateDay.text);
+
+        if (converter.SendCurrencyListRequest(builder.ToString()))
         {
-            dateInfo.text = "Using data from " + inputDate.text;
+            dateInfo.text = "Using data from " + inputDateYear.text;
             getCurrencyButtonText.text = "Update Date";
             dateInfo.gameObject.SetActive(true);
         }
