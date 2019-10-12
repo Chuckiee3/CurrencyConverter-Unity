@@ -120,7 +120,7 @@ public class ActionHandler : MonoBehaviour
 
         if (converter.SendCurrencyListRequest(builder.ToString()))
         {
-            dateInfo.text = "Using data from " + inputDateYear.text;
+            dateInfo.text = "Using data from " + builder.ToString();
             getCurrencyButtonText.text = "Update Date";
             dateInfo.gameObject.SetActive(true);
         }
